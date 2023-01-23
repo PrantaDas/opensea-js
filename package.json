@@ -1,0 +1,21 @@
+{
+  "name": "openseajs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.5",
+    "axios": "^1.2.3",
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20",
+    "opensea-js": "^4.0.13",
+    "web3": "^1.8.1"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "resolutions": {
+    "@0x/utils": "https://github.com/ProjectOpensea/0x-tools/raw/provider-patch/utils/0x-utils-6.5.0.tgz"
+  }
+}
