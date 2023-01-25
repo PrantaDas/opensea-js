@@ -104,7 +104,7 @@ const getTokenBalance = async (accountAddress, tokenAddress) => {
  * @param {number} endAmount end amount
  * @returns response of the listed asset
  */
-const makeOffer = async (tokenId, tokenAddress, accountAddress, startAmount, endAmount) => {
+const listAsset = async (tokenId, tokenAddress, accountAddress, startAmount, endAmount) => {
     try {
         let assetObject = {
             asset: {
@@ -139,7 +139,7 @@ const makeOffer = async (tokenId, tokenAddress, accountAddress, startAmount, end
  * @param {Number} startAmount the start amount
  * @returns transaction hash
  */
-const createOffer = async (tokenId, tokenAddress, schemaName, accountAddress, startAmount) => {
+const createOffer = async (tokenId, tokenAddress, schemaName, startAmount) => {
     try {
         let orderObj = {
             asset: {
@@ -147,12 +147,12 @@ const createOffer = async (tokenId, tokenAddress, schemaName, accountAddress, st
                 tokenAddress,
                 schemaName: schemaName || 'ERC1155'
             },
-            accountAddress,
-            startAmount: startAmount || 1000000000000000000
+            accountAddress: process.env.WALLET_ADDRESS,
+            startAmount: startAmount
         };
 
-        const trxHash = await openseaSDK.createBuyOrder(orderObj);
-        return trxHash;
+        const offer = await openseaSDK.createBuyOrder(orderObj);
+        return offer;
     }
     catch (e) { console.log(`[+]   ${e}`) }
 };
@@ -214,4 +214,4 @@ const getAllOrder = async (tokenId, tokenAddress) => {
 };
 
 
-module.exports = { getBalance, getAsset, getAseetBalance, getTokenBalance, createOffer, makeOffer, getCollectionStat, placeOrder, transferAsset };
+module.exports = { getBalance, getAsset, getAseetBalance, getTokenBalance, createOffer, listAsset, getCollectionStat, placeOrder, transferAsset, getAllOrder };
