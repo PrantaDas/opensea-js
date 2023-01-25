@@ -32,18 +32,27 @@ let orderObj = {
 
 async function test() {
     try {
-        let payLoad = {
-            token_id: '99594647061978534468532609838878724278064030191675643512898771045365430878209',
-            price: 0.1
-        }
 
-        const signature = await web3.eth.sign(payLoad, process.env.WALLET_ADDRESS);
-        console.log(signature)
-        const { data } = await axios.post(`https://testnets-api.opensea.io/v2/orders/goerli/seaport/offers`, {
-            ...payLoad,
-            signature
-        });
-        console.log(data);
+        const price = await web3.utils.toWei('0.00000001', 'ether');
+        const balanceOfWETH = await openseaSDK.getTokenBalance({
+            accountAddress: '0xd36D75a5da2135cc4E834764a60C2Adcf97b1440', // string
+            tokenAddress: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+        })
+        return console.log(balanceOfWETH)
+        // return console.log(price)
+
+        const offer = await openseaSDK.createBuyOrder({
+            asset: {
+                tokenId: '95631409356815567861028268063158584947317398217371012175566858161905037475841',
+                tokenAddress: '0xf4910C763eD4e47A585E2D34baA9A4b611aE448C',
+                schemaName: 'RSC1155' // WyvernSchemaName. If omitted, defaults to 'ERC721'. Other options include 'ERC20' and 'ERC1155'
+            },
+            accountAddress: process.env.WALLET_ADDRESS,
+            // Value of the offer, in units of the payment token (or wrapped ETH if none is specified):
+            startAmount: 0.01
+        })
+        console.log(offer)
+
     }
     catch (e) { console.log(e) }
 };

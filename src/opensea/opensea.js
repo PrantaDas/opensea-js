@@ -4,7 +4,7 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 require('dotenv').config();
 const axios = require('axios');
 
-const expirationTime = Math.round(Date.now() / 1000 + 60 * 60 * 24)
+const expirationTime = Math.round(Date.now() / 1000 + 60 * 60 * 24);
 
 const providerInstance = new HDWalletProvider({
     mnemonic: process.env.MNEMONIC_PHRASE,
@@ -145,10 +145,10 @@ const createOffer = async (tokenId, tokenAddress, schemaName, accountAddress, st
             asset: {
                 tokenId,
                 tokenAddress,
-                schemaName
+                schemaName: schemaName || 'ERC1155'
             },
             accountAddress,
-            startAmount
+            startAmount: startAmount || 1000000000000000000
         };
 
         const trxHash = await openseaSDK.createBuyOrder(orderObj);
@@ -180,4 +180,38 @@ const placeOrder = async (tokenAddress, tokenId, accountAddress) => {
 };
 
 
-module.exports = { getBalance, getAsset, getAseetBalance, getTokenBalance, createOffer, makeOffer, getCollectionStat, placeOrder };
+const transferAsset = async (tokenId, tokenAddress, fromAddress, toAddress) => {
+    try {
+        const data = await getAsset(tokenAddress, tokenId);
+        let assetObj = {
+            asset: {
+                tokenId,
+                tokenAddress,
+                schemaName: data.assetContract.schemaName
+            },
+            fromAddress,
+            toAddress
+        };
+
+        const trxHash = await openseaSDK.transfer(assetObj);
+        return trxHash;
+
+    }
+    catch (e) { console.log(e) }
+};
+
+
+const getAllOrder = async (tokenId, tokenAddress) => {
+    try {
+        const { orders } = await openseaSDK.getOrders({
+            assetContractAddress: tokenAddress,
+            tokenId,
+            side: "ask"
+        });
+        return orders;
+    }
+    catch (e) { console.log(e) }
+};
+
+
+module.exports = { getBalance, getAsset, getAseetBalance, getTokenBalance, createOffer, makeOffer, getCollectionStat, placeOrder, transferAsset };
