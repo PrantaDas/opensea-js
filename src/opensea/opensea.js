@@ -18,45 +18,53 @@ const openseaSDK = new OpenSeaSDK(providerInstance, {
     networkName: Network.Goerli
 });
 
-
 /**
- * 
- * @param {String} walletAddress wallet address of the user 
- * @returns the balance of the wallet
+ * Get the balance of a wallet.
+ *
+ * @async
+ * @function getBalance
+ * @param {String} walletAddress - Wallet address of the user.
+ * @returns {Promise<string>} The balance of the wallet.
  */
 const getBalance = async (walletAddress) => {
     try {
-        const balance = await web3.eth.getBalance(wallet);
+        const balance = await web3.eth.getBalance(walletAddress);
         return balance;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
 /**
- * 
- * @param {String} tokenAddress the token address of an asset
- * @param {String} tokenId the tokenId of an asset
- * @returns the assets daa
+ * Get detailed information about an asset.
+ *
+ * @async
+ * @function getAsset
+ * @param {String} tokenAddress - The token address of the asset.
+ * @param {String} tokenId - The tokenId of the asset.
+ * @returns {Promise<Object>} The asset data.
  */
 const getAsset = async (tokenAddress, tokenId) => {
     try {
         const asset = await openseaSDK.api.getAsset({
             tokenAddress,
             tokenId
-        })
+        });
         return asset;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
 /**
- * 
- * @param {String} tokenAddress asset's token address
- * @param {String} tokenId asset's token Id
- * @param {String} accountAddress the asset's account address
- * @returns asset balance
+ * Get the balance of an asset.
+ *
+ * @async
+ * @function getAssetBalance
+ * @param {String} tokenAddress - Asset's token address.
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} accountAddress - The asset's account address.
+ * @returns {Promise<string>} The asset balance.
  */
 const getAseetBalance = async (tokenAddress, tokenId, accountAddress) => {
     try {
@@ -70,39 +78,44 @@ const getAseetBalance = async (tokenAddress, tokenId, accountAddress) => {
 
         const assetBalance = await openseaSDK.getAssetBalance(assetObject);
         return assetBalance;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
 /**
- * 
- * @param {String} accountAddress token's account address
- * @param {String} tokenAddress token address
- * @returns token balance
+ * Get the balance of a token.
+ *
+ * @async
+ * @function getTokenBalance
+ * @param {String} accountAddress - Token's account address.
+ * @param {String} tokenAddress - Token address.
+ * @returns {Promise<string>} The token balance.
  */
 const getTokenBalance = async (accountAddress, tokenAddress) => {
     try {
         let tokenObj = {
             accountAddress,
             tokenAddress
-        }
+        };
         const tokenBalance = await openseaSDK.getTokenBalance(tokenObj);
         return tokenBalance;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
-
 /**
- * 
- * @param {String} tokenId asset's token id
- * @param {String} tokenAddress asset's token address
- * @param {String} accountAddress asset's account address
- * @param {Number} startAmount start amount
- * @param {number} endAmount end amount
- * @returns response of the listed asset
+ * List an asset for sale on OpenSea.
+ *
+ * @async
+ * @function listAsset
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} tokenAddress - Asset's token address.
+ * @param {String} accountAddress - Asset's account address.
+ * @param {Number} startAmount - Start amount.
+ * @param {Number} endAmount - End amount.
+ * @returns {Promise<Object>} Response of the listed asset.
  */
 const listAsset = async (tokenId, tokenAddress, accountAddress, startAmount, endAmount) => {
     try {
@@ -118,26 +131,28 @@ const listAsset = async (tokenId, tokenAddress, accountAddress, startAmount, end
         };
         if (endAmount) {
             assetObject.endAmount = endAmount;
-        }
-        else {
+        } else {
             assetObject.endAmount = startAmount;
         }
 
         const res = await openseaSDK.createSellOrder(assetObject);
         return res;
 
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
 /**
- * 
- * @param {String} tokenId asset's token Id
- * @param {String} tokenAddress asset' token address
- * @param {String} schemaName the schema name
- * @param {String} accountAddress the user wallet address
- * @param {Number} startAmount the start amount
- * @returns transaction hash
+ * Create an offer for an asset on OpenSea.
+ *
+ * @async
+ * @function createOffer
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} tokenAddress - Asset's token address.
+ * @param {String} schemaName - The schema name.
+ * @param {Number} startAmount - The start amount.
+ * @returns {Promise<Object>} Transaction hash.
  */
 const createOffer = async (tokenId, tokenAddress, schemaName, startAmount) => {
     try {
@@ -153,18 +168,38 @@ const createOffer = async (tokenId, tokenAddress, schemaName, startAmount) => {
 
         const offer = await openseaSDK.createBuyOrder(orderObj);
         return offer;
+    } catch (e) {
+        console.error(`[+]   ${e}`);
     }
-    catch (e) { console.log(`[+]   ${e}`) }
 };
 
+/**
+ * Get statistics for an OpenSea collection.
+ *
+ * @async
+ * @function getCollectionStat
+ * @param {String} slug - The collection slug.
+ * @returns {Promise<Object>} Collection statistics.
+ */
 const getCollectionStat = async (slug) => {
     try {
         const { data } = await axios.get(`https://testnets-api.opensea.io/api/v1/collection/${slug}/stats`);
         return data;
+    } catch (e) {
+        console.error(`[+]  ${e}`);
     }
-    catch (e) { console.log(`[+]  ${e}`) }
 };
 
+/**
+ * Place an order for an asset on OpenSea.
+ *
+ * @async
+ * @function placeOrder
+ * @param {String} tokenAddress - Asset's token address.
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} accountAddress - Asset's account address.
+ * @returns {Promise<string>} Transaction hash.
+ */
 const placeOrder = async (tokenAddress, tokenId, accountAddress) => {
     try {
         let filterObj = {
@@ -175,11 +210,22 @@ const placeOrder = async (tokenAddress, tokenId, accountAddress) => {
         const order = await openseaSDK.api.getOrder(filterObj);
         const trxhash = await openseaSDK.fulfillOrder({ order, accountAddress });
         return trxhash;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
+/**
+ * Transfer an asset on OpenSea.
+ *
+ * @async
+ * @function transferAsset
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} tokenAddress - Asset's token address.
+ * @param {String} fromAddress - The sender's address.
+ * @param {String} toAddress - The recipient's address.
+ * @returns {Promise<string>} Transaction hash.
+ */
 const transferAsset = async (tokenId, tokenAddress, fromAddress, toAddress) => {
     try {
         const data = await getAsset(tokenAddress, tokenId);
@@ -196,11 +242,20 @@ const transferAsset = async (tokenId, tokenAddress, fromAddress, toAddress) => {
         const trxHash = await openseaSDK.transfer(assetObj);
         return trxHash;
 
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
+/**
+ * Get all ask orders for a specific asset on OpenSea.
+ *
+ * @async
+ * @function getAllOrder
+ * @param {String} tokenId - Asset's tokenId.
+ * @param {String} tokenAddress - Asset's token address.
+ * @returns {Promise<Array>} An array of ask orders.
+ */
 const getAllOrder = async (tokenId, tokenAddress) => {
     try {
         const { orders } = await openseaSDK.getOrders({
@@ -209,9 +264,20 @@ const getAllOrder = async (tokenId, tokenAddress) => {
             side: "ask"
         });
         return orders;
+    } catch (e) {
+        console.error(e);
     }
-    catch (e) { console.log(e) }
 };
 
-
-module.exports = { getBalance, getAsset, getAseetBalance, getTokenBalance, createOffer, listAsset, getCollectionStat, placeOrder, transferAsset, getAllOrder };
+module.exports = {
+    getBalance,
+    getAsset,
+    getAseetBalance,
+    getTokenBalance,
+    createOffer,
+    listAsset,
+    getCollectionStat,
+    placeOrder,
+    transferAsset,
+    getAllOrder
+};
